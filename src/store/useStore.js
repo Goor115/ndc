@@ -103,6 +103,7 @@ export function useStore() {
     personnel,
     setPersonnel,
     getSchedule,
+    saveSchedule,
     addCard,
     removeCard,
     updateCard,

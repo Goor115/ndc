@@ -2,17 +2,22 @@ import { useState } from 'react'
 import dayjs from 'dayjs'
 import { useStore } from './store/useStore'
 import MissionCard from './components/Cards/MissionCard'
+import DepartmentPanel from './components/Personnel/DepartmentPanel'
+import PersonnelManager from './components/Personnel/PersonnelManager'
+import NaryadHeader from './components/Header/NaryadHeader'
 
 function App() {
   const [selectedDate, setSelectedDate] = useState(dayjs().format('YYYY-MM-DD'))
 
   const {
     personnel,
+    setPersonnel,
     getSchedule,
     addCard,
     removeCard,
     updateCard,
     getBusyPersonnel,
+    saveSchedule,
   } = useStore()
 
   const schedule = getSchedule(selectedDate)
@@ -20,7 +25,7 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
-      {/* Шапка */}
+      {/* Шапка сайту */}
       <header className="bg-gray-800 border-b border-gray-700 px-6 py-3 flex items-center justify-between">
         <h1 className="text-xl font-bold text-blue-400">📋 Наряд робіт</h1>
         <div className="flex items-center gap-4">
@@ -36,8 +41,19 @@ function App() {
         </div>
       </header>
 
+      {/* Шапка наряду */}
+      <div className="px-4 pt-4">
+        <NaryadHeader
+          date={selectedDate}
+          schedule={schedule}
+          onUpdate={(updatedSchedule) =>
+            saveSchedule(selectedDate, updatedSchedule)
+          }
+        />
+      </div>
+
       {/* Основний контент */}
-      <main className="flex gap-4 p-4">
+      <main className="flex gap-4 px-4 pb-4">
         {/* Ліва частина — картки виїздів */}
         <div className="flex-1">
           <div className="flex items-center justify-between mb-3">
@@ -75,31 +91,31 @@ function App() {
           )}
         </div>
 
-        {/* Права частина — особовий склад */}
-        <div className="w-72">
+        {/* Права частина — відділи */}
+        <div className="w-72 overflow-y-auto max-h-screen pb-4">
           <h2 className="text-lg font-semibold text-gray-300 mb-3">
             👥 Особовий склад
           </h2>
-          <div className="bg-gray-800 rounded-lg border border-gray-700 p-3">
-            {personnel.map((person) => {
-              const isBusy = busyPersonnel.has(person.id)
-              return (
-                <div
-                  key={person.id}
-                  className={`flex items-center justify-between px-2 py-1 rounded mb-1 text-sm ${
-                    isBusy
-                      ? 'bg-green-900 text-green-300'
-                      : 'bg-gray-700 text-gray-200'
-                  }`}
-                >
-                  <span>{person.name}</span>
-                  <span className="text-xs">
-                    {isBusy ? '🚗 виїзд' : '🏠 на місці'}
-                  </span>
-                </div>
+          <PersonnelManager
+            personnel={personnel}
+            onAdd={(person) => setPersonnel((prev) => [...prev, person])}
+            onRemove={(id) =>
+              setPersonnel((prev) => prev.filter((p) => p.id !== id))
+            }
+            onUpdate={(updated) =>
+              setPersonnel((prev) =>
+                prev.map((p) => (p.id === updated.id ? updated : p)),
               )
-            })}
-          </div>
+            }
+          />
+          <DepartmentPanel
+            schedule={schedule}
+            personnel={personnel}
+            busyPersonnel={busyPersonnel}
+            onUpdate={(updatedSchedule) =>
+              saveSchedule(selectedDate, updatedSchedule)
+            }
+          />
         </div>
       </main>
     </div>
