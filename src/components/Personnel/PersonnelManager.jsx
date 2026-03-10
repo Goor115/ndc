@@ -55,29 +55,31 @@ function PersonnelManager({ personnel, onAdd, onRemove, onUpdate, isAdmin }) {
       </div>
 
       {/* Додати нового */}
-      <div className="flex gap-2 mb-3">
+      <div className="flex flex-col gap-2 mb-3">
         <input
           type="text"
           placeholder="Ім'я Прізвище..."
           value={newName}
           onChange={(e) => setNewName(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
-          className="bg-gray-700 text-white px-2 py-1 rounded text-xs border border-gray-600 flex-1 outline-none focus:border-blue-500"
+          className="bg-gray-700 text-white px-2 py-1 rounded text-xs border border-gray-600 w-full outline-none focus:border-blue-500"
         />
-        <select
-          value={newRole}
-          onChange={(e) => setNewRole(e.target.value)}
-          className="bg-gray-700 text-white px-2 py-1 rounded text-xs border border-gray-600"
-        >
-          <option value="crew">Екіпаж</option>
-          <option value="driver">Водій</option>
-        </select>
-        <button
-          onClick={handleAdd}
-          className="bg-blue-600 hover:bg-blue-500 text-white px-2 py-1 rounded text-xs"
-        >
-          + Додати
-        </button>
+        <div className="flex gap-2">
+          <select
+            value={newRole}
+            onChange={(e) => setNewRole(e.target.value)}
+            className="bg-gray-700 text-white px-2 py-1 rounded text-xs border border-gray-600 flex-1"
+          >
+            <option value="crew">Екіпаж</option>
+            <option value="driver">Водій</option>
+          </select>
+          <button
+            onClick={handleAdd}
+            className="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1 rounded text-xs"
+          >
+            + Додати
+          </button>
+        </div>
       </div>
 
       {/* Список людей */}

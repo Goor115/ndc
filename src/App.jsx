@@ -7,6 +7,7 @@ import PersonnelManager from './components/Personnel/PersonnelManager'
 import NaryadHeader from './components/Header/NaryadHeader'
 import { useAuth } from './store/useAuth'
 import LoginPage from './components/Auth/LoginPage'
+import DayStats from './components/Stats/DayStats'
 
 function App() {
   const [selectedDate, setSelectedDate] = useState(dayjs().format('YYYY-MM-DD'))
@@ -43,21 +44,12 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
-      <div className="flex items-center gap-3">
-        <span className="text-gray-400 text-sm">👤 {currentUser.name}</span>
-        <button
-          onClick={() => {
-            logout()
-            window.location.reload()
-          }}
-          className="bg-gray-700 hover:bg-gray-600 text-gray-300 px-3 py-1 rounded text-sm"
-        >
-          Вийти
-        </button>
-      </div>
       {/* Шапка сайту */}
       <header className="bg-gray-800 border-b border-gray-700 px-6 py-3 flex items-center justify-between">
-        <h1 className="text-xl font-bold text-blue-400">📋 Наряд робіт</h1>
+        <div className="flex items-center gap-4">
+          <h1 className="text-xl font-bold text-blue-400">📋 Наряд робіт</h1>
+          <DayStats schedule={schedule} personnel={personnel} />
+        </div>
         <div className="flex items-center gap-4">
           <input
             type="date"
@@ -68,6 +60,16 @@ function App() {
           <span className="text-gray-400 text-sm">
             {dayjs(selectedDate).format('DD.MM.YYYY')}
           </span>
+          <span className="text-gray-400 text-sm">👤 {currentUser.name}</span>
+          <button
+            onClick={() => {
+              logout()
+              window.location.reload()
+            }}
+            className="bg-gray-700 hover:bg-gray-600 text-gray-300 px-3 py-1 rounded text-sm"
+          >
+            Вийти
+          </button>
         </div>
       </header>
 

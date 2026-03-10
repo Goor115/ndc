@@ -1,4 +1,5 @@
 const DEPARTMENTS = [
+  { key: 'ou', label: 'ОУ' },
   { key: 'vyyizd', label: 'Виїзд' },
   { key: 'tech', label: 'Технічний відділ' },
   { key: 'auto', label: 'Автослужба' },
@@ -53,7 +54,15 @@ function DepartmentPanel({
     })
   }
 
-  const availablePersonnel = personnel.filter((p) => !busyPersonnel.has(p.id))
+  // Збираємо всіх хто вже має статус в будь-якому відділі
+  const assignedPersonnel = new Set()
+  Object.values(statuses).forEach((people) => {
+    people.forEach((p) => assignedPersonnel.add(p.id))
+  })
+
+  const availablePersonnel = personnel.filter(
+    (p) => !busyPersonnel.has(p.id) && !assignedPersonnel.has(p.id),
+  )
 
   return (
     <div className="flex flex-col gap-2">
