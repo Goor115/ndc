@@ -18,7 +18,13 @@ const DEPARTMENTS = [
   { key: 'nachalnyk', label: 'Начальник' },
 ]
 
-function DepartmentPanel({ schedule, onUpdate, personnel, busyPersonnel }) {
+function DepartmentPanel({
+  schedule,
+  onUpdate,
+  personnel,
+  busyPersonnel,
+  isAdmin,
+}) {
   const statuses = schedule.statuses || {}
 
   const getPersonInDept = (key) => {
@@ -62,26 +68,28 @@ function DepartmentPanel({ schedule, onUpdate, personnel, busyPersonnel }) {
               <span className="text-xs font-semibold text-gray-400 uppercase">
                 {dept.label}
               </span>
-              <select
-                onChange={(e) => {
-                  const person = personnel.find(
-                    (p) => p.id === Number(e.target.value),
-                  )
-                  if (person) addPersonToDept(dept.key, person)
-                  e.target.value = ''
-                }}
-                className="bg-gray-700 text-white px-1 py-0.5 rounded text-xs border border-gray-600"
-                defaultValue=""
-              >
-                <option value="" disabled>
-                  + додати
-                </option>
-                {availablePersonnel.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.name}
+              {isAdmin && (
+                <select
+                  onChange={(e) => {
+                    const person = personnel.find(
+                      (p) => p.id === Number(e.target.value),
+                    )
+                    if (person) addPersonToDept(dept.key, person)
+                    e.target.value = ''
+                  }}
+                  className="bg-gray-700 text-white px-1 py-0.5 rounded text-xs border border-gray-600"
+                  defaultValue=""
+                >
+                  <option value="" disabled>
+                    + додати
                   </option>
-                ))}
-              </select>
+                  {availablePersonnel.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.name}
+                    </option>
+                  ))}
+                </select>
+              )}
             </div>
             <div className="flex flex-col gap-0.5">
               {people.map((person) => (
@@ -90,12 +98,14 @@ function DepartmentPanel({ schedule, onUpdate, personnel, busyPersonnel }) {
                   className="flex items-center justify-between bg-gray-700 rounded px-2 py-0.5"
                 >
                   <span className="text-xs text-gray-200">{person.name}</span>
-                  <button
-                    onClick={() => removePersonFromDept(dept.key, person.id)}
-                    className="text-gray-500 hover:text-red-400 text-xs"
-                  >
-                    ✕
-                  </button>
+                  {isAdmin && (
+                    <button
+                      onClick={() => removePersonFromDept(dept.key, person.id)}
+                      className="text-gray-500 hover:text-red-400 text-xs"
+                    >
+                      ✕
+                    </button>
+                  )}
                 </div>
               ))}
             </div>

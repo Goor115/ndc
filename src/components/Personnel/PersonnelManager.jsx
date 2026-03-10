@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-function PersonnelManager({ personnel, onAdd, onRemove, onUpdate }) {
+function PersonnelManager({ personnel, onAdd, onRemove, onUpdate, isAdmin }) {
   const [isOpen, setIsOpen] = useState(false)
   const [newName, setNewName] = useState('')
   const [newRole, setNewRole] = useState('crew')
@@ -28,6 +28,8 @@ function PersonnelManager({ personnel, onAdd, onRemove, onUpdate }) {
     onUpdate({ ...person, name: editName.trim() })
     setEditId(null)
   }
+
+  if (!isAdmin) return null
 
   if (!isOpen) {
     return (

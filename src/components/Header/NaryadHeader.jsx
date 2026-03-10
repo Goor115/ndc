@@ -1,14 +1,14 @@
 import { useState } from 'react'
 import dayjs from 'dayjs'
 
-function NaryadHeader({ date, schedule, onUpdate }) {
+function NaryadHeader({ date, schedule, onUpdate, isAdmin }) {
   const [isOpen, setIsOpen] = useState(false)
   const header = schedule.header || {}
 
   const update = (field, value) => {
     onUpdate({
       ...schedule,
-      header: { ...header, [field]: value }
+      header: { ...header, [field]: value },
     })
   }
 
@@ -20,12 +20,14 @@ function NaryadHeader({ date, schedule, onUpdate }) {
             {dayjs(date).format('DD.MM.YYYY')}
           </span>
         </div>
-        <button
-          onClick={() => setIsOpen(!isOpen)}
-          className="text-gray-400 hover:text-gray-200 text-sm"
-        >
-          {isOpen ? '▲ Згорнути' : '▼ Шапка наряду'}
-        </button>
+        {isAdmin && (
+          <button
+            onClick={() => setIsOpen(!isOpen)}
+            className="text-gray-400 hover:text-gray-200 text-sm"
+          >
+            {isOpen ? '▲ Згорнути' : '▼ Шапка наряду'}
+          </button>
+        )}
       </div>
 
       {isOpen && (
@@ -35,7 +37,8 @@ function NaryadHeader({ date, schedule, onUpdate }) {
             <input
               type="text"
               value={header.chergovyi || ''}
-              onChange={e => update('chergovyi', e.target.value)}
+              onChange={(e) => update('chergovyi', e.target.value)}
+              disabled={!isAdmin}
               placeholder="ПІБ чергового..."
               className="w-full bg-gray-700 text-white px-2 py-1 rounded text-sm border border-gray-600 outline-none focus:border-blue-500"
             />
@@ -45,7 +48,8 @@ function NaryadHeader({ date, schedule, onUpdate }) {
             <input
               type="text"
               value={header.pislya || ''}
-              onChange={e => update('pislya', e.target.value)}
+              onChange={(e) => update('pislya', e.target.value)}
+              disabled={!isAdmin}
               placeholder="ПІБ..."
               className="w-full bg-gray-700 text-white px-2 py-1 rounded text-sm border border-gray-600 outline-none focus:border-blue-500"
             />
@@ -55,7 +59,8 @@ function NaryadHeader({ date, schedule, onUpdate }) {
             <input
               type="text"
               value={header.nachalnyk || ''}
-              onChange={e => update('nachalnyk', e.target.value)}
+              onChange={(e) => update('nachalnyk', e.target.value)}
+              disabled={!isAdmin}
               placeholder="ПІБ начальника..."
               className="w-full bg-gray-700 text-white px-2 py-1 rounded text-sm border border-gray-600 outline-none focus:border-blue-500"
             />
@@ -65,7 +70,8 @@ function NaryadHeader({ date, schedule, onUpdate }) {
             <input
               type="text"
               value={header.vidpovidalnyi || ''}
-              onChange={e => update('vidpovidalnyi', e.target.value)}
+              onChange={(e) => update('vidpovidalnyi', e.target.value)}
+              disabled={!isAdmin}
               placeholder="ПІБ відповідального..."
               className="w-full bg-gray-700 text-white px-2 py-1 rounded text-sm border border-gray-600 outline-none focus:border-blue-500"
             />

@@ -5,10 +5,24 @@ import MissionCard from './components/Cards/MissionCard'
 import DepartmentPanel from './components/Personnel/DepartmentPanel'
 import PersonnelManager from './components/Personnel/PersonnelManager'
 import NaryadHeader from './components/Header/NaryadHeader'
+import { useAuth } from './store/useAuth'
+import LoginPage from './components/Auth/LoginPage'
 
 function App() {
   const [selectedDate, setSelectedDate] = useState(dayjs().format('YYYY-MM-DD'))
-
+  const { currentUser, login, logout, isAdmin, isViewer, isLoggedIn } =
+    useAuth()
+  if (!isLoggedIn) {
+    return (
+      <LoginPage
+        onLogin={(l, p) => {
+          const success = login(l, p)
+          if (success) window.location.reload()
+          return success
+        }}
+      />
+    )
+  }
   const {
     personnel,
     setPersonnel,
@@ -20,11 +34,27 @@ function App() {
     saveSchedule,
   } = useStore()
 
-  const schedule = getSchedule(selectedDate)
+  const schedule = getSchedule(selectedDate) || {
+    cards: [],
+    statuses: {},
+    header: {},
+  }
   const busyPersonnel = getBusyPersonnel(selectedDate)
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
+      <div className="flex items-center gap-3">
+        <span className="text-gray-400 text-sm">👤 {currentUser.name}</span>
+        <button
+          onClick={() => {
+            logout()
+            window.location.reload()
+          }}
+          className="bg-gray-700 hover:bg-gray-600 text-gray-300 px-3 py-1 rounded text-sm"
+        >
+          Вийти
+        </button>
+      </div>
       {/* Шапка сайту */}
       <header className="bg-gray-800 border-b border-gray-700 px-6 py-3 flex items-center justify-between">
         <h1 className="text-xl font-bold text-blue-400">📋 Наряд робіт</h1>
@@ -46,6 +76,7 @@ function App() {
         <NaryadHeader
           date={selectedDate}
           schedule={schedule}
+          isAdmin={isAdmin}
           onUpdate={(updatedSchedule) =>
             saveSchedule(selectedDate, updatedSchedule)
           }
@@ -58,12 +89,14 @@ function App() {
         <div className="flex-1">
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-lg font-semibold text-gray-300">🚗 Виїзди</h2>
-            <button
-              onClick={() => addCard(selectedDate)}
-              className="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1 rounded text-sm"
-            >
-              + Додати виїзд
-            </button>
+            {isAdmin && (
+              <button
+                onClick={() => addCard(selectedDate)}
+                className="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1 rounded text-sm"
+              >
+                + Додати виїзд
+              </button>
+            )}
           </div>
 
           {schedule.cards.length === 0 ? (
@@ -81,6 +114,7 @@ function App() {
                   date={selectedDate}
                   personnel={personnel}
                   busyPersonnel={busyPersonnel}
+                  isAdmin={isAdmin}
                   onUpdate={(updates) =>
                     updateCard(selectedDate, card.id, updates)
                   }
@@ -98,6 +132,7 @@ function App() {
           </h2>
           <PersonnelManager
             personnel={personnel}
+            isAdmin={isAdmin}
             onAdd={(person) => setPersonnel((prev) => [...prev, person])}
             onRemove={(id) =>
               setPersonnel((prev) => prev.filter((p) => p.id !== id))
@@ -112,6 +147,7 @@ function App() {
             schedule={schedule}
             personnel={personnel}
             busyPersonnel={busyPersonnel}
+            isAdmin={isAdmin}
             onUpdate={(updatedSchedule) =>
               saveSchedule(selectedDate, updatedSchedule)
             }

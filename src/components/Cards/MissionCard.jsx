@@ -5,6 +5,7 @@ function MissionCard({
   onRemove,
   busyPersonnel,
   personnel,
+  isAdmin,
 }) {
   const shifts = [
     { value: '1', label: '1-а зміна' },
@@ -42,23 +43,27 @@ function MissionCard({
           type="text"
           placeholder="Назва роботи..."
           value={card.title}
-          onChange={(e) => onUpdate({ title: e.target.value })}
-          className="bg-gray-700 text-white px-2 py-1 rounded text-sm flex-1 mr-2 border border-gray-600 focus:border-blue-500 outline-none"
+          onChange={(e) => isAdmin && onUpdate({ title: e.target.value })}
+          disabled={!isAdmin}
+          className={`bg-gray-700 text-white px-2 py-1 rounded text-sm flex-1 mr-2 border border-gray-600 outline-none ${isAdmin ? 'focus:border-blue-500' : 'opacity-60 cursor-not-allowed'}`}
         />
-        <button
-          onClick={onRemove}
-          className="text-red-400 hover:text-red-300 text-lg leading-none"
-        >
-          ✕
-        </button>
+        {isAdmin && (
+          <button
+            onClick={onRemove}
+            className="text-red-400 hover:text-red-300 text-lg leading-none"
+          >
+            ✕
+          </button>
+        )}
       </div>
 
       {/* Зміна і час */}
       <div className="flex gap-2">
         <select
           value={card.shift}
-          onChange={(e) => onUpdate({ shift: e.target.value })}
-          className="bg-gray-700 text-white px-2 py-1 rounded text-xs border border-gray-600 flex-1"
+          onChange={(e) => isAdmin && onUpdate({ shift: e.target.value })}
+          disabled={!isAdmin}
+          className={`bg-gray-700 text-white px-2 py-1 rounded text-xs border border-gray-600 flex-1 ${!isAdmin ? 'opacity-60 cursor-not-allowed' : ''}`}
         >
           {shifts.map((s) => (
             <option key={s.value} value={s.value}>
@@ -75,6 +80,7 @@ function MissionCard({
           type="time"
           value={card.timeFrom}
           onChange={(e) => onUpdate({ timeFrom: e.target.value })}
+          disabled={!isAdmin}
           className="bg-gray-700 text-white px-2 py-1 rounded border border-gray-600 flex-1"
         />
         <span>до</span>
@@ -82,6 +88,7 @@ function MissionCard({
           type="time"
           value={card.timeTo}
           onChange={(e) => onUpdate({ timeTo: e.target.value })}
+          disabled={!isAdmin}
           className="bg-gray-700 text-white px-2 py-1 rounded border border-gray-600 flex-1"
         />
       </div>
@@ -92,6 +99,7 @@ function MissionCard({
         placeholder="Номер авто..."
         value={card.vehicle}
         onChange={(e) => onUpdate({ vehicle: e.target.value })}
+        disabled={!isAdmin}
         className="bg-gray-700 text-white px-2 py-1 rounded text-sm border border-gray-600 focus:border-blue-500 outline-none"
       />
 
@@ -101,23 +109,27 @@ function MissionCard({
         {card.driver ? (
           <div className="flex items-center justify-between bg-blue-900 rounded px-2 py-1">
             <span className="text-sm text-blue-200">{card.driver.name}</span>
-            <button
-              onClick={() => onUpdate({ driver: null })}
-              className="text-blue-400 hover:text-red-400 text-xs"
-            >
-              ✕
-            </button>
+            {isAdmin && (
+              <button
+                onClick={() => onUpdate({ driver: null })}
+                className="text-blue-400 hover:text-red-400 text-xs"
+              >
+                ✕
+              </button>
+            )}
           </div>
         ) : (
           <select
+            disabled={!isAdmin}
             onChange={(e) => {
+              if (!isAdmin) return
               const person = personnel.find(
                 (p) => p.id === Number(e.target.value),
               )
               if (person) setDriver(person)
               e.target.value = ''
             }}
-            className="bg-gray-700 text-white px-2 py-1 rounded text-xs border border-gray-600 w-full"
+            className={`bg-gray-700 text-white px-2 py-1 rounded text-xs border border-gray-600 w-full ${!isAdmin ? 'opacity-60 cursor-not-allowed' : ''}`}
             defaultValue=""
           >
             <option value="" disabled>
@@ -144,24 +156,28 @@ function MissionCard({
               className="flex items-center justify-between bg-green-900 rounded px-2 py-1"
             >
               <span className="text-sm text-green-200">{person.name}</span>
-              <button
-                onClick={() => removeFromCrew(person.id)}
-                className="text-green-400 hover:text-red-400 text-xs"
-              >
-                ✕
-              </button>
+              {isAdmin && (
+                <button
+                  onClick={() => removeFromCrew(person.id)}
+                  className="text-green-400 hover:text-red-400 text-xs"
+                >
+                  ✕
+                </button>
+              )}
             </div>
           ))}
         </div>
         <select
+          disabled={!isAdmin}
           onChange={(e) => {
+            if (!isAdmin) return
             const person = personnel.find(
               (p) => p.id === Number(e.target.value),
             )
             if (person) addToCrew(person)
             e.target.value = ''
           }}
-          className="bg-gray-700 text-white px-2 py-1 rounded text-xs border border-gray-600 w-full"
+          className={`bg-gray-700 text-white px-2 py-1 rounded text-xs border border-gray-600 w-full ${!isAdmin ? 'opacity-60 cursor-not-allowed' : ''}`}
           defaultValue=""
         >
           <option value="" disabled>
