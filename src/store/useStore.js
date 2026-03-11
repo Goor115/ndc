@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import dayjs from 'dayjs'
 
 // Початкові дані — список людей
 const initialPersonnel = [
@@ -99,6 +100,30 @@ export function useStore() {
     return busy
   }
 
+  const copyFromPreviousDay = (date, type) => {
+    const prevDate = dayjs(date).subtract(1, 'day').format('YYYY-MM-DD')
+    const prevSchedule = getSchedule(prevDate)
+    const currentSchedule = getSchedule(date)
+
+    if (type === 'departments') {
+      saveSchedule(date, {
+        ...currentSchedule,
+        statuses: { ...prevSchedule.statuses },
+      })
+    }
+
+    if (type === 'cards') {
+      const newCards = prevSchedule.cards.map((card) => ({
+        ...card,
+        id: Date.now() + Math.random(),
+      }))
+      saveSchedule(date, {
+        ...currentSchedule,
+        cards: newCards,
+      })
+    }
+  }
+
   return {
     personnel,
     setPersonnel,
@@ -108,5 +133,6 @@ export function useStore() {
     removeCard,
     updateCard,
     getBusyPersonnel,
+    copyFromPreviousDay,
   }
 }

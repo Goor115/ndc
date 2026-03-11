@@ -33,6 +33,7 @@ function App() {
     updateCard,
     getBusyPersonnel,
     saveSchedule,
+    copyFromPreviousDay,
   } = useStore()
 
   const schedule = getSchedule(selectedDate) || {
@@ -92,12 +93,20 @@ function App() {
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-lg font-semibold text-gray-300">🚗 Виїзди</h2>
             {isAdmin && (
-              <button
-                onClick={() => addCard(selectedDate)}
-                className="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1 rounded text-sm"
-              >
-                + Додати виїзд
-              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => copyFromPreviousDay(selectedDate, 'cards')}
+                  className="bg-gray-600 hover:bg-gray-500 text-white px-3 py-1 rounded text-sm"
+                >
+                  📋 Копіювати з попереднього дня
+                </button>
+                <button
+                  onClick={() => addCard(selectedDate)}
+                  className="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1 rounded text-sm"
+                >
+                  + Додати виїзд
+                </button>
+              </div>
             )}
           </div>
 
@@ -129,9 +138,19 @@ function App() {
 
         {/* Права частина — відділи */}
         <div className="w-72 overflow-y-auto max-h-screen pb-4">
-          <h2 className="text-lg font-semibold text-gray-300 mb-3">
-            👥 Особовий склад
-          </h2>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-lg font-semibold text-gray-300">
+              👥 Особовий склад
+            </h2>
+            {isAdmin && (
+              <button
+                onClick={() => copyFromPreviousDay(selectedDate, 'departments')}
+                className="bg-gray-600 hover:bg-gray-500 text-white px-2 py-1 rounded text-xs"
+              >
+                📋 З попереднього дня
+              </button>
+            )}
+          </div>
           <PersonnelManager
             personnel={personnel}
             isAdmin={isAdmin}
