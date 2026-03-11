@@ -46,9 +46,11 @@ function App() {
   return (
     <div className="min-h-screen bg-gray-900 text-white">
       {/* Шапка сайту */}
-      <header className="bg-gray-800 border-b border-gray-700 px-6 py-3 flex items-center justify-between">
+      <header className="bg-gray-800 border-b border-gray-700 px-6 py-3 flex items-center justify-between sticky top-0 z-50">
         <div className="flex items-center gap-4">
-          <h1 className="text-xl font-bold text-blue-400">📋 Наряд робіт</h1>
+          <h1 className="text-xl font-bold text-blue-400 whitespace-nowrap">
+            📋 Наряд робіт
+          </h1>
           <DayStats schedule={schedule} personnel={personnel} />
         </div>
         <div className="flex items-center gap-4">
@@ -56,12 +58,15 @@ function App() {
             type="date"
             value={selectedDate}
             onChange={(e) => setSelectedDate(e.target.value)}
-            className="bg-gray-700 text-white px-3 py-1 rounded border border-gray-600"
+            className="bg-gray-700 text-white px-3 py-1 rounded border border-gray-600 ml-2"
           />
           <span className="text-gray-400 text-sm">
-            {dayjs(selectedDate).format('DD.MM.YYYY')}
+            {dayjs().format('DD.MM.YYYY')}
           </span>
-          <span className="text-gray-400 text-sm">👤 {currentUser.name}</span>
+          <span className="text-gray-400 text-sm flex flex-col items-center">
+            <span>👤</span>
+            <span>{currentUser.name}</span>
+          </span>
           <button
             onClick={() => {
               logout()
@@ -139,8 +144,10 @@ function App() {
         {/* Права частина — відділи */}
         <div className="w-72 overflow-y-auto max-h-screen pb-4">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-lg font-semibold text-gray-300">
-              👥 Особовий склад
+            <h2 className="text-lg font-semibold text-gray-300 text-center">
+              👥 Особовий
+              <br />
+              склад
             </h2>
             {isAdmin && (
               <button

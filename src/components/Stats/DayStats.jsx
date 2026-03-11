@@ -14,7 +14,10 @@ function DayStats({ schedule, personnel }) {
     card.crew?.forEach((p) => busyInCards.add(p.id))
   })
   const inCrews = busyInCards.size
-  const total = Math.max(0, personnel.length - onVacation - onSick)
+  const total = Math.max(
+    0,
+    personnel.filter((p) => p.role !== 'local').length - onVacation - onSick,
+  )
 
   return (
     <div className="flex items-center gap-3">

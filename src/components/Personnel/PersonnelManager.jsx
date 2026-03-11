@@ -72,6 +72,7 @@ function PersonnelManager({ personnel, onAdd, onRemove, onUpdate, isAdmin }) {
           >
             <option value="crew">Екіпаж</option>
             <option value="driver">Водій</option>
+            <option value="local">Місцеві</option>
           </select>
           <button
             onClick={handleAdd}
@@ -121,10 +122,16 @@ function PersonnelManager({ personnel, onAdd, onRemove, onUpdate, isAdmin }) {
                   className={`text-xs px-1 rounded ${
                     person.role === 'driver'
                       ? 'bg-blue-900 text-blue-300'
-                      : 'bg-gray-600 text-gray-300'
+                      : person.role === 'local'
+                        ? 'bg-purple-900 text-purple-300'
+                        : 'bg-gray-600 text-gray-300'
                   }`}
                 >
-                  {person.role === 'driver' ? '🚗' : '👤'}
+                  {person.role === 'driver'
+                    ? '🚗'
+                    : person.role === 'local'
+                      ? '🏢'
+                      : '👤'}
                 </span>
                 <button
                   onClick={() => handleEdit(person)}
