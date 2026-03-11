@@ -90,13 +90,15 @@ export function useStore() {
   }
 
   // Хто зайнятий в цей день
-  const getBusyPersonnel = (date) => {
-    const schedule = getSchedule(date)
+  const getBusyPersonnel = (date, currentSchedule) => {
+    const schedule = currentSchedule || getSchedule(date)
     const busy = new Set()
+
     schedule.cards.forEach((card) => {
       if (card.driver) busy.add(card.driver.id)
       card.crew.forEach((p) => busy.add(p.id))
     })
+
     return busy
   }
 
@@ -125,6 +127,7 @@ export function useStore() {
   }
 
   return {
+    schedules,
     personnel,
     setPersonnel,
     getSchedule,

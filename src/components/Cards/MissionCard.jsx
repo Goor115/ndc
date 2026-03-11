@@ -16,9 +16,10 @@ function MissionCard({
 
   const availablePersonnel = personnel.filter(
     (p) =>
-      !busyPersonnel.has(p.id) ||
-      card.driver?.id === p.id ||
-      card.crew.some((c) => c.id === p.id),
+      p.role !== 'local' &&
+      (!busyPersonnel.has(p.id) ||
+        card.driver?.id === p.id ||
+        card.crew.some((c) => c.id === p.id)),
   )
 
   const addToCrew = (person) => {

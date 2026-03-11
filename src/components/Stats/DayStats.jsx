@@ -1,23 +1,28 @@
 function DayStats({ schedule, personnel }) {
   const statuses = schedule.statuses || {}
 
-  // Кількість у відпустці
-  const onVacation = (statuses['vidpustka'] || []).length
+  const crewAndDrivers = personnel.filter(
+    (p) => p.role === 'driver' || p.role === 'crew',
+  )
 
-  // Кількість хворих
-  const onSick = (statuses['sick'] || []).length
+  const sickIds = new Set((statuses['sick'] || []).map((p) => p.id))
+  const vacationIds = new Set((statuses['vidpustka'] || []).map((p) => p.id))
+  const dayoffIds = new Set((statuses['vyhidni'] || []).map((p) => p.id))
 
-  // Задіяні в екіпажах
-  const busyInCards = new Set()
-  schedule.cards?.forEach((card) => {
-    if (card.driver) busyInCards.add(card.driver.id)
-    card.crew?.forEach((p) => busyInCards.add(p.id))
-  })
-  const inCrews = busyInCards.size
+  const onSick = crewAndDrivers.filter((p) => sickIds.has(p.id)).length
+  const onVacation = crewAndDrivers.filter((p) => vacationIds.has(p.id)).length
+  const onDayoff = crewAndDrivers.filter((p) => dayoffIds.has(p.id)).length
+
   const total = Math.max(
     0,
-    personnel.filter((p) => p.role !== 'local').length - onVacation - onSick,
+    crewAndDrivers.length - onSick - onVacation - onDayoff,
   )
+
+  let inCrews = 0
+  schedule.cards?.forEach((card) => {
+    if (card.driver?.id) inCrews++
+    inCrews += card.crew?.length || 0
+  })
 
   return (
     <div className="flex items-center gap-3">
@@ -26,13 +31,11 @@ function DayStats({ schedule, personnel }) {
         <span className="text-yellow-300 font-semibold">{onVacation}</span>
         <span className="text-yellow-500">відпустка</span>
       </div>
-
       <div className="flex items-center gap-1 bg-red-900 px-2 py-1 rounded text-xs">
         <span>🏥</span>
         <span className="text-red-300 font-semibold">{onSick}</span>
         <span className="text-red-500">хворих</span>
       </div>
-
       <div className="flex items-center gap-1 bg-green-900 px-2 py-1 rounded text-xs">
         <span>🚗</span>
         <span className="text-green-300 font-semibold">{inCrews}</span>

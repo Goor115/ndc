@@ -11,8 +11,27 @@ import DayStats from './components/Stats/DayStats'
 
 function App() {
   const [selectedDate, setSelectedDate] = useState(dayjs().format('YYYY-MM-DD'))
-  const { currentUser, login, logout, isAdmin, isViewer, isLoggedIn } =
-    useAuth()
+  const { currentUser, login, logout, isAdmin, isLoggedIn } = useAuth()
+  const {
+    schedules,
+    personnel,
+    setPersonnel,
+    addCard,
+    removeCard,
+    updateCard,
+    getBusyPersonnel,
+    saveSchedule,
+    copyFromPreviousDay,
+  } = useStore()
+
+  const rawSchedule = schedules[selectedDate]
+  const schedule = {
+    cards: rawSchedule?.cards || [],
+    statuses: rawSchedule?.statuses || {},
+    header: rawSchedule?.header || {},
+  }
+  const busyPersonnel = getBusyPersonnel(selectedDate, schedule)
+
   if (!isLoggedIn) {
     return (
       <LoginPage
@@ -24,28 +43,9 @@ function App() {
       />
     )
   }
-  const {
-    personnel,
-    setPersonnel,
-    getSchedule,
-    addCard,
-    removeCard,
-    updateCard,
-    getBusyPersonnel,
-    saveSchedule,
-    copyFromPreviousDay,
-  } = useStore()
-
-  const schedule = getSchedule(selectedDate) || {
-    cards: [],
-    statuses: {},
-    header: {},
-  }
-  const busyPersonnel = getBusyPersonnel(selectedDate)
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
-      {/* Шапка сайту */}
       <header className="bg-gray-800 border-b border-gray-700 px-6 py-3 flex items-center justify-between sticky top-0 z-50">
         <div className="flex items-center gap-4">
           <h1 className="text-xl font-bold text-blue-400 whitespace-nowrap">
@@ -79,7 +79,6 @@ function App() {
         </div>
       </header>
 
-      {/* Шапка наряду */}
       <div className="px-4 pt-4">
         <NaryadHeader
           date={selectedDate}
@@ -91,10 +90,8 @@ function App() {
         />
       </div>
 
-      {/* Основний контент */}
       <main className="flex gap-4 px-4 pb-4">
-        {/* Ліва частина — картки виїздів */}
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-lg font-semibold text-gray-300">🚗 Виїзди</h2>
             {isAdmin && (
@@ -141,8 +138,7 @@ function App() {
           )}
         </div>
 
-        {/* Права частина — відділи */}
-        <div className="w-72 overflow-y-auto max-h-screen pb-4">
+        <div className="w-72 min-w-72 overflow-y-auto max-h-screen pb-4">
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-lg font-semibold text-gray-300 text-center">
               👥 Особовий
