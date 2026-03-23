@@ -37,10 +37,10 @@ export function useStore() {
     for (const [date, schedule] of Object.entries(loadedSchedules)) {
       migratedSchedules[date] = {
         ...schedule,
-        cards: schedule.cards.map(card => ({
+        cards: schedule.cards.map((card) => ({
           ...card,
-          shift: card.shift === 'between' ? 'night' : card.shift
-        }))
+          shift: card.shift === 'between' ? 'night' : card.shift,
+        })),
       }
     }
     return migratedSchedules

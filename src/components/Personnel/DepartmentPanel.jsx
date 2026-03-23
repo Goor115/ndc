@@ -102,7 +102,10 @@ function DepartmentPanel({
             </div>
             <div className="text-xs text-gray-200 flex flex-wrap gap-1 items-center">
               {people.map((person, index) => (
-                <span key={person.id} className="inline-flex items-center gap-1 bg-gray-700 rounded px-2 py-0.5">
+                <span
+                  key={person.id}
+                  className="inline-flex items-center gap-1 bg-gray-700 rounded px-2 py-0.5"
+                >
                   <span>{person.name}</span>
                   {isAdmin && (
                     <button
@@ -112,7 +115,9 @@ function DepartmentPanel({
                       ✕
                     </button>
                   )}
-                  {index < people.length - 1 && <span className="text-gray-500">,</span>}
+                  {index < people.length - 1 && (
+                    <span className="text-gray-500">,</span>
+                  )}
                 </span>
               ))}
             </div>
