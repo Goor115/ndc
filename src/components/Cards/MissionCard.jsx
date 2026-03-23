@@ -1,6 +1,5 @@
 function MissionCard({
   card,
-  date,
   onUpdate,
   onRemove,
   busyPersonnel,
@@ -10,9 +9,32 @@ function MissionCard({
   const shifts = [
     { value: '1', label: '1-а зміна' },
     { value: '2', label: '2-а зміна' },
-    { value: 'between', label: 'Між змінами' },
+    { value: 'night', label: 'Нічна зміна' },
     { value: 'full', label: 'Цілий день' },
   ]
+
+  // Функція для отримання часу за зміною
+  const getShiftTimes = (shift) => {
+    switch (shift) {
+      case '1':
+        return { timeFrom: '07:00', timeTo: '14:00' }
+      case '2':
+        return { timeFrom: '14:00', timeTo: '21:00' }
+      case 'full':
+        return { timeFrom: '09:00', timeTo: '18:00' }
+      case 'night':
+        return { timeFrom: '21:00', timeTo: '07:00' }
+      default:
+        return { timeFrom: '08:00', timeTo: '17:00' }
+    }
+  }
+
+  // Обробник зміни зміни
+  const handleShiftChange = (newShift) => {
+    if (!isAdmin) return
+    const times = getShiftTimes(newShift)
+    onUpdate({ shift: newShift, ...times })
+  }
 
   const availablePersonnel = personnel.filter(
     (p) =>
@@ -62,7 +84,7 @@ function MissionCard({
       <div className="flex gap-2">
         <select
           value={card.shift}
-          onChange={(e) => isAdmin && onUpdate({ shift: e.target.value })}
+          onChange={(e) => handleShiftChange(e.target.value)}
           disabled={!isAdmin}
           className={`bg-gray-700 text-white px-2 py-1 rounded text-xs border border-gray-600 flex-1 ${!isAdmin ? 'opacity-60 cursor-not-allowed' : ''}`}
         >

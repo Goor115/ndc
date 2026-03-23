@@ -20,6 +20,7 @@ function App() {
     removeCard,
     updateCard,
     getBusyPersonnel,
+    getBusyPersonnelForTime,
     saveSchedule,
     copyFromPreviousDay,
   } = useStore()
@@ -90,8 +91,8 @@ function App() {
         />
       </div>
 
-      <main className="flex gap-4 px-4 pb-4">
-        <div className="flex-1 min-w-0">
+      <main className="flex flex-col lg:flex-row gap-4 px-4 pb-4">
+        <div className="w-full lg:w-2/3 min-w-0">
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-lg font-semibold text-gray-300">🚗 Виїзди</h2>
             {isAdmin && (
@@ -120,30 +121,35 @@ function App() {
             </div>
           ) : (
             <div className="grid grid-cols-2 gap-3">
-              {schedule.cards.map((card) => (
-                <MissionCard
-                  key={card.id}
-                  card={card}
-                  date={selectedDate}
-                  personnel={personnel}
-                  busyPersonnel={busyPersonnel}
-                  isAdmin={isAdmin}
-                  onUpdate={(updates) =>
-                    updateCard(selectedDate, card.id, updates)
-                  }
-                  onRemove={() => removeCard(selectedDate, card.id)}
-                />
-              ))}
+              {schedule.cards.map((card) => {
+                const cardBusyPersonnel = getBusyPersonnelForTime(
+                  selectedDate,
+                  card.id,
+                  card.timeFrom,
+                  card.timeTo,
+                )
+                return (
+                  <MissionCard
+                    key={card.id}
+                    card={card}
+                    personnel={personnel}
+                    busyPersonnel={cardBusyPersonnel}
+                    isAdmin={isAdmin}
+                    onUpdate={(updates) =>
+                      updateCard(selectedDate, card.id, updates)
+                    }
+                    onRemove={() => removeCard(selectedDate, card.id)}
+                  />
+                )
+              })}
             </div>
           )}
         </div>
 
-        <div className="w-72 min-w-72 overflow-y-auto max-h-screen pb-4">
+        <div className="w-full lg:w-1/3 min-w-0 overflow-y-auto max-h-screen pb-4">
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-lg font-semibold text-gray-300 text-center">
-              👥 Особовий
-              <br />
-              склад
+              👥 Особовий склад
             </h2>
             {isAdmin && (
               <button

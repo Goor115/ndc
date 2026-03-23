@@ -24,11 +24,12 @@ function DayStats({ schedule, personnel }) {
     crewAndDrivers.length - sickCrewCount - vacationCrewCount - onDayoff,
   )
 
-  let inCrews = 0
+  const engagedIds = new Set()
   schedule.cards?.forEach((card) => {
-    if (card.driver?.id) inCrews++
-    inCrews += card.crew?.length || 0
+    if (card.driver?.id) engagedIds.add(card.driver.id)
+    card.crew?.forEach((p) => engagedIds.add(p.id))
   })
+  const inCrews = engagedIds.size
 
   return (
     <div className="flex items-center gap-3">

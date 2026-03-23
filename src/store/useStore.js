@@ -30,7 +30,21 @@ export function useStore() {
     load('personnel', initialPersonnel),
   )
 
-  const [schedules, setSchedules] = useState(() => load('schedules', {}))
+  const [schedules, setSchedules] = useState(() => {
+    const loadedSchedules = load('schedules', {})
+    // Міграція: замінити 'between' на 'night'
+    const migratedSchedules = {}
+    for (const [date, schedule] of Object.entries(loadedSchedules)) {
+      migratedSchedules[date] = {
+        ...schedule,
+        cards: schedule.cards.map(card => ({
+          ...card,
+          shift: card.shift === 'between' ? 'night' : card.shift
+        }))
+      }
+    }
+    return migratedSchedules
+  })
 
   // Автозбереження при змінах
   useEffect(() => {
@@ -60,8 +74,8 @@ export function useStore() {
       vehicle: '',
       crew: [],
       shift: '1',
-      timeFrom: '08:00',
-      timeTo: '17:00',
+      timeFrom: '07:00',
+      timeTo: '14:00',
     }
     saveSchedule(date, {
       ...schedule,
@@ -102,6 +116,38 @@ export function useStore() {
     return busy
   }
 
+  const parseMinutes = (time) => {
+    const [h, m] = time.split(':').map(Number)
+    return h * 60 + m
+  }
+
+  const timeRangesOverlap = (fromA, toA, fromB, toB) => {
+    let startA = parseMinutes(fromA)
+    let endA = parseMinutes(toA)
+    let startB = parseMinutes(fromB)
+    let endB = parseMinutes(toB)
+
+    if (endA <= startA) endA += 24 * 60
+    if (endB <= startB) endB += 24 * 60
+
+    return startA < endB && startB < endA
+  }
+
+  const getBusyPersonnelForTime = (date, cardId, timeFrom, timeTo) => {
+    const schedule = getSchedule(date)
+    const busy = new Set()
+
+    schedule.cards.forEach((card) => {
+      if (card.id === cardId) return
+      if (timeRangesOverlap(card.timeFrom, card.timeTo, timeFrom, timeTo)) {
+        if (card.driver) busy.add(card.driver.id)
+        card.crew.forEach((p) => busy.add(p.id))
+      }
+    })
+
+    return busy
+  }
+
   const copyFromPreviousDay = (date, type) => {
     const prevDate = dayjs(date).subtract(1, 'day').format('YYYY-MM-DD')
     const prevSchedule = getSchedule(prevDate)
@@ -136,6 +182,7 @@ export function useStore() {
     removeCard,
     updateCard,
     getBusyPersonnel,
+    getBusyPersonnelForTime,
     copyFromPreviousDay,
   }
 }

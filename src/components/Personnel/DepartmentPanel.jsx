@@ -100,22 +100,20 @@ function DepartmentPanel({
                 </select>
               )}
             </div>
-            <div className="flex flex-col gap-0.5">
-              {people.map((person) => (
-                <div
-                  key={person.id}
-                  className="flex items-center justify-between bg-gray-700 rounded px-2 py-0.5"
-                >
-                  <span className="text-xs text-gray-200">{person.name}</span>
+            <div className="text-xs text-gray-200 flex flex-wrap gap-1 items-center">
+              {people.map((person, index) => (
+                <span key={person.id} className="inline-flex items-center gap-1 bg-gray-700 rounded px-2 py-0.5">
+                  <span>{person.name}</span>
                   {isAdmin && (
                     <button
                       onClick={() => removePersonFromDept(dept.key, person.id)}
-                      className="text-gray-500 hover:text-red-400 text-xs"
+                      className="text-gray-400 hover:text-red-300 text-xs"
                     >
                       ✕
                     </button>
                   )}
-                </div>
+                  {index < people.length - 1 && <span className="text-gray-500">,</span>}
+                </span>
               ))}
             </div>
           </div>
