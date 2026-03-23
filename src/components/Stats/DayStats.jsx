@@ -9,13 +9,19 @@ function DayStats({ schedule, personnel }) {
   const vacationIds = new Set((statuses['vidpustka'] || []).map((p) => p.id))
   const dayoffIds = new Set((statuses['vyhidni'] || []).map((p) => p.id))
 
-  const onSick = crewAndDrivers.filter((p) => sickIds.has(p.id)).length
-  const onVacation = crewAndDrivers.filter((p) => vacationIds.has(p.id)).length
+  const onSick = (statuses['sick'] || []).length
+  const onVacation = (statuses['vidpustka'] || []).length
   const onDayoff = crewAndDrivers.filter((p) => dayoffIds.has(p.id)).length
+
+  // Хворі/відпускники які є crew або driver
+  const sickCrewCount = crewAndDrivers.filter((p) => sickIds.has(p.id)).length
+  const vacationCrewCount = crewAndDrivers.filter((p) =>
+    vacationIds.has(p.id),
+  ).length
 
   const total = Math.max(
     0,
-    crewAndDrivers.length - onSick - onVacation - onDayoff,
+    crewAndDrivers.length - sickCrewCount - vacationCrewCount - onDayoff,
   )
 
   let inCrews = 0
