@@ -121,16 +121,17 @@ export function useStore() {
     const schedule = currentSchedule || getSchedule(date)
     const busy = new Set()
 
+    // Задіяні у виїздах
     schedule.cards.forEach((card) => {
-      if (
-        card.driver &&
-        (card.driver.role === 'crew' || card.driver.role === 'crew_driver')
-      )
-        busy.add(card.driver.id)
-      card.crew.forEach((p) => {
-        if (p.role === 'crew' || p.role === 'crew_driver') busy.add(p.id)
-      })
+      if (card.driver) busy.add(card.driver.id)
+      card.crew.forEach((p) => busy.add(p.id))
     })
+
+    // Хворі, відпустка, вихідні — не можуть їхати
+    const statuses = schedule.statuses || {}
+    ;(statuses['sick'] || []).forEach((p) => busy.add(p.id))
+    ;(statuses['vidpustka'] || []).forEach((p) => busy.add(p.id))
+    ;(statuses['vyhidni'] || []).forEach((p) => busy.add(p.id))
 
     return busy
   }
@@ -159,16 +160,16 @@ export function useStore() {
     schedule.cards.forEach((card) => {
       if (card.id === cardId) return
       if (timeRangesOverlap(card.timeFrom, card.timeTo, timeFrom, timeTo)) {
-        if (
-          card.driver &&
-          (card.driver.role === 'crew' || card.driver.role === 'crew_driver')
-        )
-          busy.add(card.driver.id)
-        card.crew.forEach((p) => {
-          if (p.role === 'crew' || p.role === 'crew_driver') busy.add(p.id)
-        })
+        if (card.driver) busy.add(card.driver.id)
+        card.crew.forEach((p) => busy.add(p.id))
       }
     })
+
+    // Хворі, відпустка, вихідні — не можуть їхати
+    const statuses = schedule.statuses || {}
+    ;(statuses['sick'] || []).forEach((p) => busy.add(p.id))
+    ;(statuses['vidpustka'] || []).forEach((p) => busy.add(p.id))
+    ;(statuses['vyhidni'] || []).forEach((p) => busy.add(p.id))
 
     return busy
   }
