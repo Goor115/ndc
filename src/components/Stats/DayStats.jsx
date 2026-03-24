@@ -2,7 +2,10 @@ function DayStats({ schedule, personnel }) {
   const statuses = schedule.statuses || {}
 
   const crewAndDrivers = personnel.filter(
-    (p) => p.role === 'driver' || p.role === 'crew',
+    (p) =>
+      p.role === 'driver' ||
+      p.role === 'crew' ||
+      p.role === 'crew_driver',
   )
 
   const sickIds = new Set((statuses['sick'] || []).map((p) => p.id))
