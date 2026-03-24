@@ -2,10 +2,7 @@ function DayStats({ schedule, personnel }) {
   const statuses = schedule.statuses || {}
 
   const crewAndDrivers = personnel.filter(
-    (p) =>
-      p.role === 'driver' ||
-      p.role === 'crew' ||
-      p.role === 'crew_driver',
+    (p) => p.role === 'driver' || p.role === 'crew' || p.role === 'crew_driver',
   )
 
   const sickIds = new Set((statuses['sick'] || []).map((p) => p.id))
@@ -29,7 +26,11 @@ function DayStats({ schedule, personnel }) {
 
   const engagedIds = new Set()
   schedule.cards?.forEach((card) => {
-    if (card.driver?.id && (card.driver.role === 'crew' || card.driver.role === 'crew_driver')) engagedIds.add(card.driver.id)
+    if (
+      card.driver?.id &&
+      (card.driver.role === 'crew' || card.driver.role === 'crew_driver')
+    )
+      engagedIds.add(card.driver.id)
     card.crew?.forEach((p) => {
       if (p.role === 'crew' || p.role === 'crew_driver') engagedIds.add(p.id)
     })
