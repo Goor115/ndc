@@ -25,6 +25,7 @@ const USERS = [
 ```
 
 ### Допоміжна функція `load(key, fallback)`
+
 ```javascript
 const load = (key, fallback) => {
   try {
@@ -35,7 +36,9 @@ const load = (key, fallback) => {
   }
 }
 ```
+
 **Що робить:**
+
 - Завантажує дані з `localStorage`
 - Парсить JSON
 - Повертає fallback значення якщо помилка
@@ -45,21 +48,22 @@ const load = (key, fallback) => {
 ### Hook `useAuth()`
 
 #### Стан:
+
 ```javascript
-const [currentUser, setCurrentUser] = useState(() =>
-  load('currentUser', null),
-)
+const [currentUser, setCurrentUser] = useState(() => load('currentUser', null))
 ```
+
 - Завантажує користувача при ініціалізації з localStorage
 
 #### Метод: `login(loginInput, passwordInput)`
+
 ```javascript
 const login = (loginInput, passwordInput) => {
   // 1. Знайти користувача в масиві USERS
   const user = USERS.find(
     (u) => u.login === loginInput && u.password === passwordInput,
   )
-  
+
   // 2. Якщо знайдено:
   if (user) {
     // Створити об'єкт без пароля (безпека)
@@ -73,33 +77,39 @@ const login = (loginInput, passwordInput) => {
     localStorage.setItem('currentUser', JSON.stringify(safeUser))
     // Оновити state
     setCurrentUser(safeUser)
-    return true  // Успішний вхід
+    return true // Успішний вхід
   }
-  return false  // Невірні облікові дані
+  return false // Невірні облікові дані
 }
 ```
 
 **Повертає:** `boolean` — успішність входу
 
 #### Метод: `logout()`
+
 ```javascript
 const logout = () => {
   localStorage.removeItem('currentUser')
   setCurrentUser(null)
 }
 ```
+
 **Що робить:** Очищає localStorage та state
 
 #### Метод: `isLoggedIn()`
+
 ```javascript
 const isLoggedIn = !!currentUser
 ```
+
 **Повертає:** `boolean` — чи залогінений користувач
 
 #### Метод: `isAdmin()`
+
 ```javascript
 const isAdmin = currentUser?.role === 'admin'
 ```
+
 **Повертає:** `boolean` — чи адміністратор
 
 ---
@@ -119,6 +129,7 @@ const initialPersonnel = [
 ### Допоміжні функції
 
 #### `load(key, fallback)` та `save(key, data)`
+
 ```javascript
 const load = (key, fallback) => {
   try {
@@ -139,32 +150,35 @@ const save = (key, data) => {
 ### Hook `useStore()`
 
 #### Ініціалізація персоналу з міграцією:
+
 ```javascript
 const [personnel, setPersonnel] = useState(() => {
   const loadedPersonnel = load('personnel', initialPersonnel)
-  
+
   // Міграція: оновити старі ролі
   const migratedPersonnel = loadedPersonnel.map((person) => {
     let newRole = person.role
-    if (person.role === 'driver') newRole = 'crew_driver'      // Старе → нове
-    if (person.role === 'local_crew') newRole = 'local'        // Старе → нове
+    if (person.role === 'driver') newRole = 'crew_driver' // Старе → нове
+    if (person.role === 'local_crew') newRole = 'local' // Старе → нове
     return { ...person, role: newRole }
   })
-  
+
   return migratedPersonnel
 })
 ```
 
 **Міграції:**
+
 - `driver` → `crew_driver`
 - `local_crew` → `local`
 
 #### Ініціалізація графіків з міграцією:
+
 ```javascript
 const [schedules, setSchedules] = useState(() => {
   const loadedSchedules = load('schedules', {})
   const migratedSchedules = {}
-  
+
   // Замінити 'between' на 'night'
   for (const [date, schedule] of Object.entries(loadedSchedules)) {
     migratedSchedules[date] = {
@@ -175,7 +189,7 @@ const [schedules, setSchedules] = useState(() => {
       })),
     }
   }
-  
+
   return migratedSchedules
 })
 ```
@@ -185,11 +199,12 @@ const [schedules, setSchedules] = useState(() => {
 ### Основні методи
 
 #### `addPersonnel(person)`
+
 ```javascript
 // person: { id?, name: string, role: string }
 const addPersonnel = (person) => {
   const newPerson = {
-    id: person.id || Date.now(),  // Генерувати ID якщо немає
+    id: person.id || Date.now(), // Генерувати ID якщо немає
     ...person,
   }
   const updated = [...personnel, newPerson]
@@ -199,12 +214,13 @@ const addPersonnel = (person) => {
 ```
 
 #### `removePersonnel(id)`
+
 ```javascript
 const removePersonnel = (id) => {
   const updated = personnel.filter((p) => p.id !== id)
   setPersonnel(updated)
   save('personnel', updated)
-  
+
   // Також видалити з усіх графіків
   const updatedSchedules = Object.entries(schedules).reduce(...)
   setSchedules(updatedSchedules)
@@ -213,11 +229,10 @@ const removePersonnel = (id) => {
 ```
 
 #### `updatePersonnel(person)`
+
 ```javascript
 const updatePersonnel = (person) => {
-  const updated = personnel.map((p) =>
-    p.id === person.id ? person : p,
-  )
+  const updated = personnel.map((p) => (p.id === person.id ? person : p))
   setPersonnel(updated)
   save('personnel', updated)
 }
@@ -226,6 +241,7 @@ const updatePersonnel = (person) => {
 ---
 
 #### `addCard(card)`
+
 ```javascript
 // Додати завдання на поточну дату
 const addCard = (card) => {
@@ -235,14 +251,14 @@ const addCard = (card) => {
     statuses: {},
     header: {},
   }
-  
+
   const newCard = {
     id: Date.now(),
     driver: null,
     crew: [],
     ...card,
   }
-  
+
   const updated = {
     ...schedules,
     [today]: {
@@ -250,41 +266,41 @@ const addCard = (card) => {
       cards: [...schedule.cards, newCard],
     },
   }
-  
+
   setSchedules(updated)
   save('schedules', updated)
 }
 ```
 
 #### `updateCard(cardId, updates)`
+
 ```javascript
 const updateCard = (cardId, updates) => {
   const today = dayjs().format('YYYY-MM-DD')
   const schedule = schedules[today]
-  
+
   const updated = {
     ...schedules,
     [today]: {
       ...schedule,
       cards: schedule.cards.map((card) =>
-        card.id === cardId
-          ? { ...card, ...updates }
-          : card,
+        card.id === cardId ? { ...card, ...updates } : card,
       ),
     },
   }
-  
+
   setSchedules(updated)
   save('schedules', updated)
 }
 ```
 
 #### `removeCard(cardId)`
+
 ```javascript
 const removeCard = (cardId) => {
   const today = dayjs().format('YYYY-MM-DD')
   const schedule = schedules[today]
-  
+
   const updated = {
     ...schedules,
     [today]: {
@@ -292,7 +308,7 @@ const removeCard = (cardId) => {
       cards: schedule.cards.filter((c) => c.id !== cardId),
     },
   }
-  
+
   setSchedules(updated)
   save('schedules', updated)
 }
@@ -301,55 +317,59 @@ const removeCard = (cardId) => {
 ---
 
 #### `getBusyPersonnel(date, schedule)`
+
 ```javascript
 // Повернути всіх людей які де-небудь призначені
 const getBusyPersonnel = (date, schedule) => {
   const busy = new Set()
-  
+
   // Водії та екіпаж на карточках
   schedule.cards?.forEach((card) => {
     if (card.driver?.id) busy.add(card.driver.id)
     card.crew?.forEach((p) => busy.add(p.id))
   })
-  
+
   // Люди в статусах (хворі, відпустка тощо)
   Object.values(schedule.statuses || {}).forEach((people) => {
     people.forEach((p) => busy.add(p.id))
   })
-  
-  return busy  // Set<id>
+
+  return busy // Set<id>
 }
 ```
 
 **Використання:**
+
 ```javascript
 const busyPersonnel = getBusyPersonnel(selectedDate, schedule)
 // busyPersonnel.has(personId) // true якщо зайнята
 ```
 
 #### `getBusyPersonnelForTime(date, timeFrom, timeTo)`
+
 ```javascript
 // Люди які зайняті в конкретний час одного дня
 const getBusyPersonnelForTime = (date, timeFrom, timeTo) => {
   const schedule = schedules[date]
   const busy = new Set()
-  
+
   schedule.cards?.forEach((card) => {
     // Перевірити перетин часу
     const cardStart = card.timeFrom || '00:00'
     const cardEnd = card.timeTo || '23:59'
-    
+
     if (timeOverlap(cardStart, cardEnd, timeFrom, timeTo)) {
       if (card.driver?.id) busy.add(card.driver.id)
       card.crew?.forEach((p) => busy.add(p.id))
     }
   })
-  
+
   return busy
 }
 ```
 
 #### `saveSchedule()`
+
 ```javascript
 const saveSchedule = () => {
   save('schedules', schedules)
@@ -357,30 +377,31 @@ const saveSchedule = () => {
 ```
 
 #### `copyFromPreviousDay(date)`
+
 ```javascript
 // Копіювати розклад з попереднього дня
 const copyFromPreviousDay = (date) => {
   const prevDate = dayjs(date).subtract(1, 'day').format('YYYY-MM-DD')
   const prevSchedule = schedules[prevDate]
-  
+
   if (!prevSchedule) return false
-  
+
   const newSchedule = {
     ...prevSchedule,
     cards: prevSchedule.cards.map((card) => ({
       ...card,
-      id: Date.now() + Math.random(),  // Нові ID
+      id: Date.now() + Math.random(), // Нові ID
     })),
     // Статуси не копіюються
     statuses: {},
-    header: {},  // Заголовок не копіюється
+    header: {}, // Заголовок не копіюється
   }
-  
+
   setSchedules({
     ...schedules,
     [date]: newSchedule,
   })
-  
+
   return true
 }
 ```
@@ -436,6 +457,7 @@ interface Personnel {
 ## 📝 Вхідні точки хуків
 
 ### useAuth
+
 ```javascript
 import { useAuth } from './store/useAuth'
 
@@ -446,6 +468,7 @@ function MyComponent() {
 ```
 
 ### useStore
+
 ```javascript
 import { useStore } from './store/useStore'
 
@@ -506,6 +529,7 @@ save() → localStorage
 ### Що НЕ забезпечує безпеку:
 
 ⚠️ **Це локальний додаток без backend'у, тому:**
+
 - Пароль впроте видний в коді (тільки для demo)
 - Нічого не захищено крім перевірження на клієнті
 - localStorage доступний будь-якому скрипту на сторінці
@@ -515,6 +539,7 @@ save() → localStorage
 ## 🚀 Оптимізація та розширення
 
 ### Можливі інтеграції:
+
 - Backend API для синхронізації
 - Справжню аутентифікацію (JWT)
 - Календар-виб для вибору дат
@@ -522,6 +547,7 @@ save() → localStorage
 - Експорт у PDF/Excel
 
 ### Можливі дефекти для фіксу:
+
 - Немає валідації на неправильні часи
 - Немає запобігання перекритням часу для одної людини
 - Немає відновлення при помилці

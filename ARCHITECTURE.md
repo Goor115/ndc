@@ -273,7 +273,7 @@ copyFromPreviousDay(selectedDate) викликається
     { id: 2, name: 'Петро', role: 'crew' },
     // ...
   ],
-  
+
   schedules: {
     '2024-03-15': {
       cards: [
@@ -318,6 +318,7 @@ copyFromPreviousDay(selectedDate) викликається
 ## localStorage структура
 
 ### Ключ: `currentUser`
+
 ```json
 {
   "id": 1,
@@ -328,6 +329,7 @@ copyFromPreviousDay(selectedDate) викликається
 ```
 
 ### Ключ: `personnel`
+
 ```json
 [
   {
@@ -344,6 +346,7 @@ copyFromPreviousDay(selectedDate) викликається
 ```
 
 ### Ключ: `schedules`
+
 ```json
 {
   "2024-03-15": {
@@ -417,13 +420,13 @@ getBusyPersonnelForTime('2024-03-15', '07:00', '14:00')
           │
           ├─ Проходимо по всіх карточках дня
           ├─ Для кожной карточки перевіримо перетин часу
-          │  Формула: 
+          │  Формула:
           │    cardStart < userEnd AND cardEnd > userStart
           │    (07:00 < 14:00 AND 14:00 > 07:00) → 🔴 КОНФЛІКТ
           │
           └─ Додаємо в busySet тих хто конфліктує
-                  
-         
+
+
 Наслідок: Людина НЕ доступна якщо часи перекриваються
 ```
 
