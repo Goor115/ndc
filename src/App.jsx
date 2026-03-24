@@ -65,7 +65,6 @@ function App() {
             {dayjs().format('DD.MM.YYYY')}
           </span>
           <span className="text-gray-400 text-sm flex flex-col items-center">
-            <span>👤</span>
             <span>{currentUser.name}</span>
           </span>
           <button

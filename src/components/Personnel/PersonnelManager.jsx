@@ -23,6 +23,21 @@ function PersonnelManager({ personnel, onAdd, onRemove, onUpdate, isAdmin }) {
     setEditName(person.name)
   }
 
+  const getRoleIcon = (role) => {
+    switch (role) {
+      case 'crew':
+        return '�' // екіпаж
+      case 'crew_driver':
+        return '🚗' // водій екіпажу
+      case 'local':
+        return '' // місцевий без іконки праворуч (але залишається просто текст)
+      case 'local_driver':
+        return '🚌' // місцевий водій автобус
+      default:
+        return ''
+    }
+  }
+
   const handleSaveEdit = (person) => {
     if (!editName.trim()) return
     onUpdate({ ...person, name: editName.trim() })
@@ -71,8 +86,9 @@ function PersonnelManager({ personnel, onAdd, onRemove, onUpdate, isAdmin }) {
             className="bg-gray-700 text-white px-2 py-1 rounded text-xs border border-gray-600 flex-1"
           >
             <option value="crew">Екіпаж</option>
-            <option value="driver">Водій</option>
-            <option value="local">Місцеві</option>
+            <option value="crew_driver">Водій екіпажу</option>
+            <option value="local">Місцевий</option>
+            <option value="local_driver">Місцевий водій</option>
           </select>
           <button
             onClick={handleAdd}
@@ -118,20 +134,11 @@ function PersonnelManager({ personnel, onAdd, onRemove, onUpdate, isAdmin }) {
                 <span className="text-xs text-gray-200 flex-1">
                   {person.name}
                 </span>
-                <span
-                  className={`text-xs px-1 rounded ${
-                    person.role === 'driver'
-                      ? 'bg-blue-900 text-blue-300'
-                      : person.role === 'local'
-                        ? 'bg-purple-900 text-purple-300'
-                        : 'bg-gray-600 text-gray-300'
-                  }`}
-                >
-                  {person.role === 'driver'
-                    ? '🚗'
-                    : person.role === 'local'
-                      ? '🏢'
-                      : '👤'}
+                <span className="text-xs px-1 rounded bg-gray-600 text-gray-200">
+                  {person.role === 'crew' && '👤'}
+                  {person.role === 'crew_driver' && '🚗'}
+                  {person.role === 'local' && '🏠'}
+                  {person.role === 'local_driver' && '🚌'}
                 </span>
                 <button
                   onClick={() => handleEdit(person)}

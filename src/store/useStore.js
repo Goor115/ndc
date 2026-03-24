@@ -3,11 +3,15 @@ import dayjs from 'dayjs'
 
 // Початкові дані — список людей
 const initialPersonnel = [
-  { id: 1, name: 'Іваненко Іван', role: 'driver' },
+  { id: 1, name: 'Іваненко Іван', role: 'crew_driver' },
   { id: 2, name: 'Петренко Петро', role: 'crew' },
   { id: 3, name: 'Сидоренко Сидір', role: 'crew' },
   { id: 4, name: 'Коваленко Олег', role: 'crew' },
-  { id: 5, name: 'Мельник Василь', role: 'driver' },
+  { id: 5, name: 'Мельник Василь', role: 'crew_driver' },
+  { id: 6, name: 'Локальний Водій 1', role: 'local_driver' },
+  { id: 7, name: 'Локальний Водій 2', role: 'local_driver' },
+  { id: 8, name: 'Локальний Екіпаж 1', role: 'local' },
+  { id: 9, name: 'Локальний Екіпаж 2', role: 'local' },
 ]
 
 // Зчитати з localStorage
@@ -26,9 +30,18 @@ const save = (key, data) => {
 }
 
 export function useStore() {
-  const [personnel, setPersonnel] = useState(() =>
-    load('personnel', initialPersonnel),
-  )
+  const [personnel, setPersonnel] = useState(() => {
+    const loadedPersonnel = load('personnel', initialPersonnel)
+    // Міграція: оновити ролі персоналу
+    const migratedPersonnel = loadedPersonnel.map((person) => {
+      let newRole = person.role
+      if (person.role === 'driver') newRole = 'crew_driver'
+      if (person.role === 'local_crew') newRole = 'local'
+      // 'local' і 'local_driver' залишаються без змін
+      return { ...person, role: newRole }
+    })
+    return migratedPersonnel
+  })
 
   const [schedules, setSchedules] = useState(() => {
     const loadedSchedules = load('schedules', {})
@@ -109,8 +122,14 @@ export function useStore() {
     const busy = new Set()
 
     schedule.cards.forEach((card) => {
-      if (card.driver) busy.add(card.driver.id)
-      card.crew.forEach((p) => busy.add(p.id))
+      if (
+        card.driver &&
+        (card.driver.role === 'crew' || card.driver.role === 'crew_driver')
+      )
+        busy.add(card.driver.id)
+      card.crew.forEach((p) => {
+        if (p.role === 'crew' || p.role === 'crew_driver') busy.add(p.id)
+      })
     })
 
     return busy
@@ -140,8 +159,14 @@ export function useStore() {
     schedule.cards.forEach((card) => {
       if (card.id === cardId) return
       if (timeRangesOverlap(card.timeFrom, card.timeTo, timeFrom, timeTo)) {
-        if (card.driver) busy.add(card.driver.id)
-        card.crew.forEach((p) => busy.add(p.id))
+        if (
+          card.driver &&
+          (card.driver.role === 'crew' || card.driver.role === 'crew_driver')
+        )
+          busy.add(card.driver.id)
+        card.crew.forEach((p) => {
+          if (p.role === 'crew' || p.role === 'crew_driver') busy.add(p.id)
+        })
       }
     })
 

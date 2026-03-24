@@ -38,10 +38,9 @@ function MissionCard({
 
   const availablePersonnel = personnel.filter(
     (p) =>
-      p.role !== 'local' &&
-      (!busyPersonnel.has(p.id) ||
-        card.driver?.id === p.id ||
-        card.crew.some((c) => c.id === p.id)),
+      !busyPersonnel.has(p.id) ||
+      card.driver?.id === p.id ||
+      card.crew.some((c) => c.id === p.id),
   )
 
   const addToCrew = (person) => {
@@ -159,7 +158,9 @@ function MissionCard({
               Обрати водія...
             </option>
             {availablePersonnel
-              .filter((p) => p.role === 'driver')
+              .filter(
+                (p) => p.role === 'crew_driver' || p.role === 'local_driver',
+              )
               .map((p) => (
                 <option key={p.id} value={p.id}>
                   {p.name}

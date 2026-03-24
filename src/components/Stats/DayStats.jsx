@@ -26,8 +26,10 @@ function DayStats({ schedule, personnel }) {
 
   const engagedIds = new Set()
   schedule.cards?.forEach((card) => {
-    if (card.driver?.id) engagedIds.add(card.driver.id)
-    card.crew?.forEach((p) => engagedIds.add(p.id))
+    if (card.driver?.id && (card.driver.role === 'crew' || card.driver.role === 'crew_driver')) engagedIds.add(card.driver.id)
+    card.crew?.forEach((p) => {
+      if (p.role === 'crew' || p.role === 'crew_driver') engagedIds.add(p.id)
+    })
   })
   const inCrews = engagedIds.size
 
