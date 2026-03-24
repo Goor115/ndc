@@ -6,6 +6,7 @@ function PersonnelManager({ personnel, onAdd, onRemove, onUpdate, isAdmin }) {
   const [newRole, setNewRole] = useState('crew')
   const [editId, setEditId] = useState(null)
   const [editName, setEditName] = useState('')
+  const [editRole, setEditRole] = useState('crew')
 
   const handleAdd = () => {
     if (!newName.trim()) return
@@ -21,6 +22,7 @@ function PersonnelManager({ personnel, onAdd, onRemove, onUpdate, isAdmin }) {
   const handleEdit = (person) => {
     setEditId(person.id)
     setEditName(person.name)
+    setEditRole(person.role)
   }
 
   const getRoleIcon = (role) => {
@@ -40,7 +42,7 @@ function PersonnelManager({ personnel, onAdd, onRemove, onUpdate, isAdmin }) {
 
   const handleSaveEdit = (person) => {
     if (!editName.trim()) return
-    onUpdate({ ...person, name: editName.trim() })
+    onUpdate({ ...person, name: editName.trim(), role: editRole })
     setEditId(null)
   }
 
@@ -116,6 +118,16 @@ function PersonnelManager({ personnel, onAdd, onRemove, onUpdate, isAdmin }) {
                   className="bg-gray-600 text-white px-2 py-0.5 rounded text-xs flex-1 outline-none"
                   autoFocus
                 />
+                <select
+                  value={editRole}
+                  onChange={(e) => setEditRole(e.target.value)}
+                  className="bg-gray-600 text-white px-2 py-0.5 rounded text-xs"
+                >
+                  <option value="crew">Екіпаж</option>
+                  <option value="crew_driver">Водій екіпажу</option>
+                  <option value="local">Місцевий</option>
+                  <option value="local_driver">Місцевий водій</option>
+                </select>
                 <button
                   onClick={() => handleSaveEdit(person)}
                   className="text-green-400 hover:text-green-300 text-xs"
